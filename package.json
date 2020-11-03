@@ -1,0 +1,13 @@
+{
+  "name": "com.autocore.sim-controller",
+  "displayName": "sim-controller",
+  "description": "Controller of Simulator",
+  "version": "1.0.0",
+  "license": "MIT",
+  "dependencies": 
+  {
+    "com.autocore.sim-ui": "https://github.com/autocore-packages/sim-ui.git#1.0.22",
+    "com.autocore.sim-ai": "https://github.com/autocore-packages/sim-ai.git#1.0.15",
+
+  }
+}

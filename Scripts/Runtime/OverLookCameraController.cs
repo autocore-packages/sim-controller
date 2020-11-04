@@ -26,8 +26,10 @@ namespace Assets.Scripts.simController
 {
     public class OverLookCameraController : UnitySingleton<OverLookCameraController>
     {
+        private Transform target;
         private Vector3 PosTarget;
-        public Camera oLCamera;
+        public Camera m_camera;
+        public Transform m_transform;
         public Ray rayPos;
         public Vector3 offset = Vector3.zero;
         public Vector3 Offset
@@ -52,8 +54,8 @@ namespace Assets.Scripts.simController
             }
         }
         public Vector3 offset_temp;
-        private float maxCameraSize = 200;
 
+        private float maxCameraSize = 200;
         private float _cameraRange = 20;
         public float CameraRange
         {
@@ -66,8 +68,29 @@ namespace Assets.Scripts.simController
                 _cameraRange = Mathf.Clamp(value, 10f, maxCameraSize);
             }
         }
-        public bool isFollowTargetPos = false;
-        public bool isFollowTargetRot = false;
+
+        private bool isFollowTargetPos = false;
+        public bool IsFollowTargetPos
+        {
+            set
+            {
+                if (value) OLCameraReset();
+                PanelSettings.Instance.toggle_FollowCarPos.isOn = value;
+                isFollowTargetPos = value;
+            }
+        }
+
+        private bool isFollowTargetRot = false;
+        public bool IsFollowTargetRot
+        {
+            set
+            {
+                if (!value) OLCameraReset();
+                PanelSettings.Instance.toggle_FollowCarRot.isOn = value;
+                isFollowTargetRot = value;
+            }
+        }
+
         private Vector3 mouseWorldPos;
         public Vector3 MouseWorldPos
         {
@@ -85,9 +108,19 @@ namespace Assets.Scripts.simController
         private bool isDrageCamera = false;
         private void Start()
         {
-            oLCamera = transform.GetComponent<Camera>();
-            transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
+            m_transform = transform;
+            m_camera = GetComponent<Camera>();
+            target = EgoVehicle.Instance.transform;
+            m_transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
             mask = 1 << 12;
+            ElementsManager.Instance.OnCameraRotate = OntargetRotate;
+        }
+
+        public void OntargetRotate(Vector3 rot)
+        {
+            Vector3 cameraRot = rot;
+            cameraRot.x = 90;
+            transform.rotation = Quaternion.Euler(cameraRot);
         }
         LayerMask mask;
         void Update()
@@ -121,7 +154,7 @@ namespace Assets.Scripts.simController
                     CameraRange *= 0.9f;
                 }
             }
-            oLCamera.orthographicSize = CameraRange;
+            m_camera.orthographicSize = CameraRange;
             if (MouseInputBase.Button2Down)
             {
                 isDrageCamera = true;
@@ -157,10 +190,13 @@ namespace Assets.Scripts.simController
             }
             if (isFollowTargetPos)
             {
-                PosTarget = EgoVehicle.Instance.transform.position;
+                PosTarget = target.position;
             }
-            if (isFollowTargetRot) FollowTargetRot();
-            transform.position = new Vector3(PosTarget.x + Offset.x, 50, PosTarget.z + Offset.z);
+            if (isFollowTargetRot) 
+            {
+                OntargetRotate(target.rotation.eulerAngles);
+            }
+            m_transform.position = new Vector3(PosTarget.x + Offset.x, 50, PosTarget.z + Offset.z);
         }
         public void SetCameraFollowTargetRotate(bool value)
         {
@@ -174,24 +210,9 @@ namespace Assets.Scripts.simController
                 transform.rotation = Quaternion.Euler(90, 0, 0);
             }
         }
-        public void SetCameraFollowTargetPosition(bool value)
-        {
-            isFollowTargetPos = value;
-            if (value)
-            {
-                OLCameraReset();
-            }
-            PanelSettings.Instance.toggle_FollowCarPos.isOn = value;
-        }
-        private void FollowTargetRot()
-        {
-            Vector3 rot = EgoVehicle.Instance.transform.rotation.eulerAngles;
-            rot.x = 90;
-            transform.rotation = Quaternion.Euler(rot);
-        }
         private bool GetWorldPos(Vector3 mousePos, out Vector3 worldPos)
         {
-            rayPos = oLCamera.ScreenPointToRay(mousePos);
+            rayPos = m_camera.ScreenPointToRay(mousePos);
             if (Physics.Raycast(rayPos, out RaycastHit raycastHit, Mathf.Infinity, mask))
             {
                 worldPos = raycastHit.point;
@@ -217,12 +238,12 @@ namespace Assets.Scripts.simController
             if (isCarCameraMain)
             {
                 CameraController.Instance.m_camera.targetTexture = null;
-                Instance.oLCamera.targetTexture = texture_RightDown;
+                Instance.m_camera.targetTexture = texture_RightDown;
             }
             else
             {
                 CameraController.Instance.m_camera.targetTexture = texture_RightDown;
-                Instance.oLCamera.targetTexture = null;
+                Instance.m_camera.targetTexture = null;
             }
         }
 
@@ -233,6 +254,7 @@ namespace Assets.Scripts.simController
         public void OLCameraReset()
         {
             CameraRange = 20;
+            transform.rotation = Quaternion.Euler(90, 0, 0);
             offset = Vector3.zero;
             PosTarget = EgoVehicle.Instance.transform.position;
         }

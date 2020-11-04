@@ -102,8 +102,8 @@ namespace Assets.Scripts.simController
                 }
             };
 
-            OverLookCameraController.Instance.SetCameraFollowTargetPosition(PanelSettings.Instance.toggle_FollowCarPos.isOn);
-            OverLookCameraController.Instance.SetCameraFollowTargetRotate(PanelSettings.Instance.toggle_FollowCarRot.isOn);
+            OverLookCameraController.Instance.IsFollowTargetPos=PanelSettings.Instance.toggle_FollowCarPos.isOn;
+            OverLookCameraController.Instance.IsFollowTargetRot=PanelSettings.Instance.toggle_FollowCarRot.isOn;
 
             PanelTools.Instance.button_resetAll.onClick.AddListener(() => 
             {

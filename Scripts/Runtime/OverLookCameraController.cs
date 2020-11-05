@@ -191,7 +191,7 @@ namespace Assets.Scripts.simController
             if (isFollowTargetPos)
             {
                 PosTarget = target.position;
-            }
+            } 
             if (isFollowTargetRot) 
             {
                 OntargetRotate(target.rotation.eulerAngles);

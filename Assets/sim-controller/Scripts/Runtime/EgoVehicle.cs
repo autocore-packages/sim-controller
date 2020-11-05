@@ -94,9 +94,6 @@ namespace Assets.Scripts.simController
         public float accelerate;
         public float aimSteer;
 
-        private void Awake()
-        {
-        }
         void Update()
         {
             if (PanelCarMessage.Instance != null)

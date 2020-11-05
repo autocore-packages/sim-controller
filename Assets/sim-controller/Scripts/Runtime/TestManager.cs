@@ -60,8 +60,9 @@ namespace Assets.Scripts.simController
                 return null;
             }
         }
-        private void Awake()
+        protected override void Awake()
         {
+            base.Awake();
             LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
         }
         // Start is called before the first frame update

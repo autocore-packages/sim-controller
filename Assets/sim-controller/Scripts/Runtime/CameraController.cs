@@ -42,19 +42,12 @@ public class CameraController : UnitySingleton<CameraController>
     private void OnEnable()
     {
         m_camera = GetComponent<Camera>();
+        m_transform = GetComponent<Transform>();
         AdquireTarget();
         ComputeTargetOffset();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
 
-    // Update is called once per frame
-    void Update()
-    {
-    }
     private void LateUpdate()
     {
         ComputeTargetOffset();
@@ -119,7 +112,6 @@ public class CameraController : UnitySingleton<CameraController>
 
         m_selfRotationAngle = m_transform.eulerAngles.y;
         m_selfHeight = m_transform.position.y;
-
     }
     private void AdquireTarget()
     {

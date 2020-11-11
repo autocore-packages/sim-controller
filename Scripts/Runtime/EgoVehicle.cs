@@ -8,34 +8,12 @@ using UnityEngine;
 namespace Assets.Scripts.simController
 {
     [RequireComponent(typeof(WheelDrive))]
+    [RequireComponent(typeof(EgoVehicleController))]
     public class EgoVehicle : UnitySingleton<EgoVehicle>
     {
-        private EgoVehicleController egoController;
-        public EgoVehicleController EgoController
-        {
-            get
-            {
-                if (egoController == null)
-                {
-                    egoController= GetComponent<EgoVehicleController>();
-                }
-                if (egoController == null)
-                {
-                    egoController = gameObject.AddComponent<EgoVehicleController>(); ;
-                }
-                return EgoController;
-            }
-        }
+        public EgoVehicleController egoController;
 
-        private WheelDrive wd;
-        public WheelDrive WD
-        {
-            get
-            {
-                if (wd == null) wd = GetComponent<WheelDrive>();
-                return wd;
-            }
-        }
+        public WheelDrive wd;
         public float LinearVelocity
         {
             get => aimSpeed;
@@ -48,14 +26,14 @@ namespace Assets.Scripts.simController
         }
         public float SteeringAngle
         {
-            get => WD.steer;
+            get => wd.steer;
             set
             {
-                if (IsHandDrive) WD.steer = value;
+                if (IsHandDrive) wd.steer = value;
             }
         }
-        public float Speed => WD.speed * 3.6f;
-        public float Angle => WD.angle * Mathf.Deg2Rad;
+        public float Speed => wd.speed * 3.6f;
+        public float Angle => wd.angle * Mathf.Deg2Rad;
 
         public void MaxAngle(float value) 
         {
@@ -66,11 +44,11 @@ namespace Assets.Scripts.simController
         {
             get
             {
-                return WD.isHandDrive;
+                return wd.isHandDrive;
             }
             set
             {
-                WD.isHandDrive = value;
+                wd.isHandDrive = value;
                 PanelSimuMessage.Instance.SetControlModeText(value ? "KeyBoard" : "RosControl");
             }
         }
@@ -94,23 +72,28 @@ namespace Assets.Scripts.simController
         public float accelerate;
         public float aimSteer;
 
+        private void OnEnable()
+        {
+            egoController = GetComponent<EgoVehicleController>();
+        }
+
         void Update()
         {
             if (PanelCarMessage.Instance != null)
             {
-                PanelCarMessage.Instance.UpdateCarmessage(WD.steer, WD.str_Odom, WD.brake, WD.throttle, wd.speed, LinearVelocity);
+                PanelCarMessage.Instance.UpdateCarmessage(wd.steer, wd.str_Odom, wd.brake, wd.throttle, wd.speed, LinearVelocity);
             }
             if (IsHandDrive)
             {
-                WD.steer = Input.GetAxis("Horizontal");
-                WD.throttle = Mathf.Abs(WD.speed) < maxSpeed/3.6f ? Input.GetAxis("Vertical") : 0;
-                WD.brake = Input.GetKey(KeyCode.X) ? 1 : 0;
+                wd.steer = Input.GetAxis("Horizontal");
+                wd.throttle = Mathf.Abs(wd.speed) < maxSpeed/3.6f ? Input.GetAxis("Vertical") : 0;
+                wd.brake = Input.GetKey(KeyCode.X) ? 1 : 0;
             }
         }
         void FixedUpdate()
         {
-            accelerate = (WD.speed - lastSpeed) / 0.02f;
-            lastSpeed = WD.speed;
+            accelerate = (wd.speed - lastSpeed) / 0.02f;
+            lastSpeed = wd.speed;
             if (!IsHandDrive)
             {
                 SpeedCalculate();
@@ -119,7 +102,7 @@ namespace Assets.Scripts.simController
 
         public void ResetCar()
         {
-            WD.SetVehiclePos(TestConfig.TestMode.TestCarStart.V3Pos.GetVector3(), Quaternion.Euler(TestConfig.TestMode.TestCarStart.V3Rot.GetVector3()));
+            wd.SetVehiclePos(TestConfig.TestMode.TestCarStart.V3Pos.GetVector3(), Quaternion.Euler(TestConfig.TestMode.TestCarStart.V3Rot.GetVector3()));
             LinearVelocity = 0;
             SteeringAngle = 0;
         }
@@ -143,9 +126,9 @@ namespace Assets.Scripts.simController
         public void SpeedCalculate()
         {
             isBackUp = aimSpeed < 0;
-            float _speed = Mathf.Abs(WD.speed);
+            float _speed = Mathf.Abs(wd.speed);
             float _aimSpeed = Mathf.Abs(aimSpeed);
-            if (_aimSpeed == 0 || aimSpeed * WD.speed < 0) driveMode = ControlMode.Brake;
+            if (_aimSpeed == 0 || aimSpeed * wd.speed < 0) driveMode = ControlMode.Brake;
             else if (_speed < _aimSpeed * 0.9f) driveMode = ControlMode.Accelerate;
             else if (_speed > _aimSpeed * 1.1f) driveMode = ControlMode.Stop;
             else if (_speed > _aimSpeed * 1f) driveMode = ControlMode.Decelerate;
@@ -173,25 +156,25 @@ namespace Assets.Scripts.simController
             throttle = Mathf.Clamp(throttle, -1, 1);
             if (driveMode == ControlMode.Brake)
             {
-                WD.throttle = 0;
-                WD.brake = 1;
+                wd.throttle = 0;
+                wd.brake = 1;
             }
             else if (driveMode == ControlMode.Decelerate)
             {
-                WD.throttle = 0;
-                WD.brake = 0;
+                wd.throttle = 0;
+                wd.brake = 0;
             }
             else
             {
                 if (throttle < 0)
                 {
-                    WD.throttle = -throttle;
-                    WD.brake = 0;
+                    wd.throttle = -throttle;
+                    wd.brake = 0;
                 }
                 else
                 {
-                    WD.throttle = isBackUp ? -throttle : throttle;
-                    WD.brake = 0;
+                    wd.throttle = isBackUp ? -throttle : throttle;
+                    wd.brake = 0;
                 }
             }
         }

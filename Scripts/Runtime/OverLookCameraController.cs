@@ -30,8 +30,8 @@ namespace Assets.Scripts.simController
         private Vector3 PosTarget;
         public Camera m_camera;
         public Transform m_transform;
-        public Ray rayPos;
-        public Vector3 offset = Vector3.zero;
+        private Ray rayPos;
+        private Vector3 offset = Vector3.zero;
         public Vector3 Offset
         {
             get
@@ -53,8 +53,7 @@ namespace Assets.Scripts.simController
                 return offset;
             }
         }
-        public Vector3 offset_temp;
-
+        private Vector3 offset_temp;
         private float maxCameraSize = 200;
         private float _cameraRange = 20;
         public float CameraRange

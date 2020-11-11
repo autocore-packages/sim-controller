@@ -4,29 +4,17 @@ using UnityEngine.AI;
 
 namespace Assets.Scripts.simController
 {
+    [RequireComponent(typeof(Animator))]
+    [RequireComponent(typeof(NavMeshAgent))]
     public class PedestrainController : PedestrianObj
     {
         private Animator pedAnimator;
-        Animator PedAnimator
-        {
-            get
-            {
-                if (pedAnimator == null) pedAnimator = GetComponent<Animator>();
-                if (pedAnimator == null) Debug.LogError("Please set Animator");
-                return pedAnimator;
-            }
-        }
         private NavMeshAgent agent;
-        NavMeshAgent Agent
+        private void OnEnable()
         {
-            get
-            {
-                if (agent == null) agent = GetComponent<NavMeshAgent>();
-                if (agent == null) Debug.LogError("Please set NavMeshAgent");
-                return agent;
-            }
+            agent = GetComponent<NavMeshAgent>();
+            pedAnimator = GetComponent<Animator>();
         }
-        
         protected override void Start()
         {
             base.Start(); 
@@ -42,20 +30,20 @@ namespace Assets.Scripts.simController
             {
                 OnReachTarget();
             }
-            PedAnimator.SetFloat("Forward", Agent.speed);
+            pedAnimator.SetFloat("Forward", agent.speed);
         }
 
         public override void SetPedstrianAim()
         {
             isReachTarget = false;
-            Agent.SetDestination(AimPos);
-            Agent.speed = speedObjTarget;
+            agent.SetDestination(AimPos);
+            agent.speed = speedObjTarget;
         }
 
         public override void SetPedstrianStop()
         {
             base.SetPedstrianStop();
-            Agent.speed = 0;
+            agent.speed = 0;
         }
     }
 }

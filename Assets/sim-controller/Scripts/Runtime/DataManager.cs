@@ -21,6 +21,7 @@ using Assets.Scripts.simai;
 using Assets.Scripts.SimuUI;
 using Newtonsoft.Json;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -28,29 +29,9 @@ using UnityEngine;
 
 namespace Assets.Scripts.simController
 {
-    public class TestDataManager
+    public class DataManager:UnitySingleton<DataManager>
     {
-        private static TestDataManager _instance;
-        public static TestDataManager Instance
-        {
-            get
-            {
-                if (_instance == null)
-                {
-                    _instance = new TestDataManager();
-                }
-                return _instance;
-            }
-        }
-        private  TestDataManager()
-        {
-            if (_instance != null)
-            {
-                Debug.LogError("this" + ToString() + "is not null");
-            }
-            Debug.Log("TestDataManager init");
-        }
-        public static string testModeName;
+        public string testModeName;
         const string timeFormat = "yyyy-MM-dd-HH-mm-ss";
         public void TDMInit()
         {
@@ -65,11 +46,11 @@ namespace Assets.Scripts.simController
             WriteTestJson(true);
         }
 
-        public static void WriteTestJson(bool isNew = false)
+        public void WriteTestJson(bool isNew = false)
         {
             SimuTestMode td = new SimuTestMode
             {
-                 TestModeName = testModeName,
+                TestModeName = testModeName,
                 MapName = TestConfig.testMap.ToString(),
                 LastTime = DateTime.Now,
                 //VoyageTestConfig = VoyageTestManager.Instance.GetVoyageTestConfig()
@@ -125,10 +106,10 @@ namespace Assets.Scripts.simController
             {
                 File.CreateText(dataFilePath).Dispose();
             }
-            WriteFileByLine(dataFilePath, DateTime.Now+" " + content);
+            WriteFileByLine(dataFilePath, DateTime.Now.ToString(timeFormat) + " " + content);
         }
 
-        public static void WriteFileByLine(string strPath, string value)
+        public void WriteFileByLine(string strPath, string value)
         {
             try
             {
@@ -142,7 +123,7 @@ namespace Assets.Scripts.simController
             }
         }
         static string testConfigPath;
-        public static void WriteByLineCover(string strPath, string content)
+        public void WriteByLineCover(string strPath, string content)
         {
             testConfigPath = strPath;
             fStream = File.Open(testConfigPath, FileMode.OpenOrCreate, FileAccess.Write);
@@ -151,22 +132,25 @@ namespace Assets.Scripts.simController
             fStream.Close();
             WriteFileByLine(testConfigPath, content);
         }
-
-        public static Vector3 ParseV3(string str)
-        {
-            str = str.Replace("(", "").Replace(")", "");
-            string[] value = str.Split(',');
-            return new Vector3(float.Parse(value[0]), float.Parse(value[1]), float.Parse(value[2]));
-        }
         private void OnDestroy()
         {
             if (sw != null) sw.Dispose();
         }
-
-        [MenuItem("Asset/WirteJson")]
-        public static void WJ()
+        public void ScreenShot()
         {
-            WriteTestJson(false);
+            StartCoroutine(UploadPNG(Path.Combine(Application.streamingAssetsPath, "ScreenShot", DateTime.Now.ToString(timeFormat) + ".png")));
+        }
+        IEnumerator UploadPNG(string path)
+        {
+            yield return new WaitForEndOfFrame();
+            int width = Screen.width;
+            int height = Screen.height;
+            Texture2D tex = new Texture2D(width, height, TextureFormat.RGB24, false);
+            tex.ReadPixels(new Rect(0, 0, width, height), 0, 0);
+            tex.Apply();
+            byte[] bytes = tex.EncodeToPNG();
+            File.WriteAllBytes(path, bytes);
+            AssetDatabase.Refresh();
         }
     }
 }

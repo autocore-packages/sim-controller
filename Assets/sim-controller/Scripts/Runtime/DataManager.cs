@@ -29,7 +29,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.simController
 {
-    public class DataManager:UnitySingleton<DataManager>
+    public class DataManager :MonoBehaviour
     {
         public string testModeName;
         const string timeFormat = "yyyy-MM-dd-HH-mm-ss";
@@ -37,79 +37,86 @@ namespace Assets.Scripts.simController
         {
             testModeName = TestConfig.TestMode.TestModeName;
             dataFilePath = Path.Combine(Application.streamingAssetsPath, "TestData", DateTime.Now.ToString(timeFormat) + ".txt");
-            WriteTestData(DateTime.Now.ToString(timeFormat) +"TestStart");
+            WriteTestData(DateTime.Now.ToString(timeFormat) + "TestStart");
         }
-        public void AddTestMode(string modename,string mapname)
+        public void AddTestMode(string modename, string mapname)
         {
             testModeName = modename;
             TestConfig.testMap = (TestConfig.TestMap)Enum.Parse(typeof(TestConfig.TestMap), mapname);
-            WriteTestJson(true);
+            WriteTestJson();
         }
 
-        public void WriteTestJson(bool isNew = false)
+        public void WriteTestJson()
         {
             SimuTestMode td = new SimuTestMode
             {
                 TestModeName = testModeName,
                 MapName = TestConfig.testMap.ToString(),
-                LastTime = DateTime.Now,
-                //VoyageTestConfig = VoyageTestManager.Instance.GetVoyageTestConfig()
+                LastTime = DateTime.Now
             };
-            if (isNew)
+            if(EgoVehicle.Instance.transform!=null) td.TestCarStart = new TransformData(EgoVehicle.Instance.transform);
+            foreach (ElementObject item in ElementsManager.Instance.checkPointManager.CheckPointList)
             {
-                td.TestCarStart = new TransformData(new Vec3(-200.0f, 0.0f, -4.5f), new Vec3(0.0f, 90.0f, 0.0f), new Vec3(1f, 1f, 1f));
-            } 
-            else
+                td.CheckPointAtts.Add(item.GetObjAttbutes());
+            }
+            foreach (ElementObject item in ElementsManager.Instance.obstacleManager.ObstacleList)
             {
-                td.TestCarStart = new TransformData(EgoVehicle.Instance.transform);
-                foreach (ElementObject item in ElementsManager.Instance.checkPointManager.CheckPointList)
-                {
-                    td.CheckPointAtts.Add(item.GetObjAttbutes());
-                }
-                foreach (ElementObject item in ElementsManager.Instance.obstacleManager.ObstacleList)
-                {
-                    td.ObstacleAtts.Add(item.GetObjAttbutes());
-                }
-                foreach (ElementObject item in ElementsManager.Instance.nPCManager.NPCList)
-                {
-                    td.CarAIAtts.Add(item.GetObjAttbutes());
-                }
-                foreach (ElementObject item in ElementsManager.Instance.pedestrianManager.PedestrainList)
-                {
-                    td.HumanAtts.Add(item.GetObjAttbutes());
-                }
-                foreach (ElementObject item in ElementsManager.Instance.trafficlightManager.TrafficLightList)
-                {
-                    td.TrafficLightAtts.Add(item.GetObjAttbutes());
-                }
+                td.ObstacleAtts.Add(item.GetObjAttbutes());
+            }
+            foreach (ElementObject item in ElementsManager.Instance.nPCManager.NPCList)
+            {
+                td.CarAIAtts.Add(item.GetObjAttbutes());
+            }
+            foreach (ElementObject item in ElementsManager.Instance.pedestrianManager.PedestrainList)
+            {
+                td.HumanAtts.Add(item.GetObjAttbutes());
+            }
+            foreach (ElementObject item in ElementsManager.Instance.trafficlightManager.TrafficLightList)
+            {
+                td.TrafficLightAtts.Add(item.GetObjAttbutes());
             }
             string content = JsonConvert.SerializeObject(td);
-            WriteByLineCover(Path.Combine(Application.streamingAssetsPath ,"TestConfigs" , td.TestModeName + ".json"), content);
+            WriteFile(Path.Combine(Application.streamingAssetsPath, "TestConfigs", td.TestModeName + ".json"), content, true);
             if (MainUI.Instance != null)
             {
-               PanelOther.Instance.SetTipText("Mode Save OK");
+                PanelOther.Instance.SetTipText("Mode Save OK");
             }
             TestConfig.TestMode = td;
         }
-        static FileStream fStream;
-        static StreamWriter sw;
-
-        private string dataFilePath;
-        public void WriteTestData( string content)
+        private void CheckFileExist(string path)
         {
-            var dic = Path.GetDirectoryName(dataFilePath);
+            string dic = Path.GetDirectoryName(path);
             if (!Directory.Exists(dic))
             {
                 Directory.CreateDirectory(dic);
+                Debug.Log("");
             }
-            if (!File.Exists(dataFilePath))
+            if (!File.Exists(path))
             {
-                File.CreateText(dataFilePath).Dispose();
+                File.CreateText(path).Dispose();
             }
-            WriteFileByLine(dataFilePath, DateTime.Now.ToString(timeFormat) + " " + content);
         }
 
-        public void WriteFileByLine(string strPath, string value)
+        #region Write data
+        private string dataFilePath;
+        public void WriteTestData(string content)
+        {
+            WriteFile(dataFilePath, DateTime.Now.ToString(timeFormat) + " " + content);
+        }
+
+        private void WriteFile(string path, string content, bool isCover = false)
+        {
+            if (isCover)
+            {
+                File.WriteAllText(path, content);
+            }
+            else
+            {
+                File.AppendAllText(path, content);
+            }
+        }
+        StreamWriter sw;
+        private void WriteFileByLine(string strPath, string value)
         {
             try
             {
@@ -122,20 +129,9 @@ namespace Assets.Scripts.simController
                 throw;
             }
         }
-        static string testConfigPath;
-        public void WriteByLineCover(string strPath, string content)
-        {
-            testConfigPath = strPath;
-            fStream = File.Open(testConfigPath, FileMode.OpenOrCreate, FileAccess.Write);
-            fStream.Seek(0, SeekOrigin.Begin);
-            fStream.SetLength(0);
-            fStream.Close();
-            WriteFileByLine(testConfigPath, content);
-        }
-        private void OnDestroy()
-        {
-            if (sw != null) sw.Dispose();
-        }
+        #endregion
+
+        #region ScreenShot
         public void ScreenShot()
         {
             StartCoroutine(UploadPNG(Path.Combine(Application.streamingAssetsPath, "ScreenShot", DateTime.Now.ToString(timeFormat) + ".png")));
@@ -152,5 +148,6 @@ namespace Assets.Scripts.simController
             File.WriteAllBytes(path, bytes);
             AssetDatabase.Refresh();
         }
+        #endregion
     }
 }

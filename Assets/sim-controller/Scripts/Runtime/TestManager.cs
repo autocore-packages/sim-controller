@@ -65,11 +65,12 @@ namespace Assets.Scripts.simController
             base.Awake();
             LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
         }
+        public DataManager dataManager;
         // Start is called before the first frame update
         void Start()
         {
             testMode = TestConfig.TestMode;
-            DataManager.Instance.TDMInit();
+            dataManager.TDMInit();
             PanelInspector.Instance.button_AddPos.onClick.AddListener(() =>
             {
                 SetHumanPoses();
@@ -210,7 +211,7 @@ namespace Assets.Scripts.simController
                             {
                                 PanelOther.Instance.SetTipText("Click to set vehicle orientation");
                                 EgoVehicle.Instance.transform.position = mousePos + Vector3.up * 0.5f;
-                                DataManager.Instance.WriteTestData("Set ego vehicle position:" + mousePos);
+                                dataManager.WriteTestData("Set ego vehicle position:" + mousePos);
                                 indexMode = 2;
                             }
                             else if (MouseInputBase.Button1Down)
@@ -243,7 +244,7 @@ namespace Assets.Scripts.simController
                         case 1:
                             if (MouseInputBase.Button0Down)
                             {
-                                DataManager.Instance.WriteTestData("Set Static Obstacle,Position:" + mousePos + "Scale:" + elementObject.transform.localScale.x);
+                                dataManager.WriteTestData("Set Static Obstacle,Position:" + mousePos + "Scale:" + elementObject.transform.localScale.x);
                                 editMode = EditMode.Null;
                             }
                             else if (MouseInputBase.Button1Down)
@@ -272,7 +273,7 @@ namespace Assets.Scripts.simController
                                 elementObject = ElementsManager.Instance.SelectedElement = ElementsManager.Instance.pedestrianManager.AddPedestrian();
                                 elementObject.transform.position = mousePos;
                                 Pedestrian.AddPedPos(mousePos);
-                                DataManager.Instance.WriteTestData("Set Human,Position:" + mousePos.ToString());
+                                dataManager.WriteTestData("Set Human,Position:" + mousePos.ToString());
                                 indexMode = 2;
                             }
                             else if (MouseInputBase.Button1Down)
@@ -344,7 +345,7 @@ namespace Assets.Scripts.simController
                                 NPC.UpdateElementAttributes();
                                 NPC.NPCInit();
                                 NPC.isCarDrive = true;
-                                DataManager.Instance.WriteTestData("Set AI vehicle Init Position:" + NPC.posInit + "Start Position:" + posStart);
+                                dataManager.WriteTestData("Set AI vehicle Init Position:" + NPC.posInit + "Start Position:" + posStart);
                                 editMode = EditMode.Null;
                             }
                             else if (Input.GetMouseButtonDown(1))
@@ -385,7 +386,7 @@ namespace Assets.Scripts.simController
                                 {
                                     //CPController.Instance.SwitchCheckPoint();
                                 }
-                                DataManager.Instance.WriteTestData("Set CheckPoint,Position:" + mousePos + "Scale:" + elementObject.transform.localScale.x);
+                                dataManager.WriteTestData("Set CheckPoint,Position:" + mousePos + "Scale:" + elementObject.transform.localScale.x);
                                 editMode = EditMode.Null;
                             }
                             else if (MouseInputBase.Button1Down)

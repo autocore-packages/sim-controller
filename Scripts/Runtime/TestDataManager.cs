@@ -29,11 +29,11 @@ using UnityEngine;
 
 namespace Assets.Scripts.simController
 {
-    public class DataManager :MonoBehaviour
+    public class TestDataManager :MonoBehaviour
     {
         public string testModeName;
         const string timeFormat = "yyyy-MM-dd-HH-mm-ss";
-        public void TDMInit()
+        public void Init()
         {
             testModeName = TestConfig.TestMode.TestModeName;
             dataFilePath = Path.Combine(Application.streamingAssetsPath, "TestData", DateTime.Now.ToString(timeFormat) + ".txt");
@@ -44,6 +44,18 @@ namespace Assets.Scripts.simController
             testModeName = modename;
             TestConfig.testMap = (TestConfig.TestMap)Enum.Parse(typeof(TestConfig.TestMap), mapname);
             WriteTestJson();
+        }
+        public void LoadRoadData(string path)
+        {
+            TextAsset textAsset = Resources.Load(path) as TextAsset;
+            if (textAsset == null)
+            {
+                Debug.Log("file failed");
+            }
+            else
+            {
+                ElementsManager.Instance.RoadsData = JsonConvert.DeserializeObject<RoadsData>(textAsset.text);
+            }
         }
 
         public void WriteTestJson()

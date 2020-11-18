@@ -10,6 +10,13 @@ namespace Assets.Scripts.simController
     {
 
         public static TestManager Instance { get; private set; }
+
+        public TestDataManager DataManager
+        {
+            get;
+            private set;
+        }
+        
         protected virtual void Awake()
         {
             if (Instance == null)
@@ -22,7 +29,13 @@ namespace Assets.Scripts.simController
             {
                 Destroy(gameObject);
             }
-            LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
+            if (DataManager == null)
+            {
+                GameObject go = new GameObject( "DataManager");
+                DataManager = go.AddComponent<TestDataManager>();
+                go.transform.SetParent(transform);
+            }
+            DataManager.LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
         }
         public SimuTestMode testMode;
         public bool isRepeat = false;
@@ -76,12 +89,12 @@ namespace Assets.Scripts.simController
                 return null;
             }
         }
-        public DataManager dataManager;
+        public TestDataManager dataManager;
         // Start is called before the first frame update
         void Start()
         {
             testMode = TestConfig.TestMode;
-            dataManager.TDMInit();
+            dataManager.Init();
             PanelInspector.Instance.button_AddPos.onClick.AddListener(() =>
             {
                 SetHumanPoses();
@@ -183,18 +196,6 @@ namespace Assets.Scripts.simController
         public void SetAddCheckPoint()
         {
             SetEditMode(EditMode.SetCheckPoint);
-        }
-        public void LoadRoadData(string path)
-        {
-            TextAsset textAsset = Resources.Load(path) as TextAsset;
-            if (textAsset == null)
-            {
-                Debug.Log("file failed");
-            }
-            else
-            {
-                ElementsManager.Instance.RoadsData = JsonConvert.DeserializeObject<RoadsData>(textAsset.text);
-            }
         }
         public Vector3 mousePos;
         ElementObject elementObject;

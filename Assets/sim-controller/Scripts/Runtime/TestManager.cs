@@ -35,6 +35,7 @@ namespace Assets.Scripts.simController
                 DataManager = go.AddComponent<TestDataManager>();
                 go.transform.SetParent(transform);
             }
+            DataManager.Init();
             DataManager.LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
         }
         public SimuTestMode testMode;
@@ -89,12 +90,10 @@ namespace Assets.Scripts.simController
                 return null;
             }
         }
-        public TestDataManager dataManager;
         // Start is called before the first frame update
         void Start()
         {
             testMode = TestConfig.TestMode;
-            dataManager.Init();
             PanelInspector.Instance.button_AddPos.onClick.AddListener(() =>
             {
                 SetHumanPoses();
@@ -127,7 +126,8 @@ namespace Assets.Scripts.simController
                     traffic.SwitchLight();
                 }
             };
-
+            Debug.Log(OverLookCameraController.Instance);
+            Debug.Log(PanelSettings.Instance);
             OverLookCameraController.Instance.IsFollowTargetPos=PanelSettings.Instance.toggle_FollowCarPos.isOn;
             OverLookCameraController.Instance.IsFollowTargetRot=PanelSettings.Instance.toggle_FollowCarRot.isOn;
 
@@ -223,7 +223,7 @@ namespace Assets.Scripts.simController
                             {
                                 PanelOther.Instance.SetTipText("Click to set vehicle orientation");
                                 EgoVehicle.Instance.transform.position = mousePos + Vector3.up * 0.5f;
-                                dataManager.WriteTestData("Set ego vehicle position:" + mousePos);
+                                DataManager.WriteTestData("Set ego vehicle position:" + mousePos);
                                 indexMode = 2;
                             }
                             else if (MouseInputBase.Button1Down)
@@ -256,7 +256,7 @@ namespace Assets.Scripts.simController
                         case 1:
                             if (MouseInputBase.Button0Down)
                             {
-                                dataManager.WriteTestData("Set Static Obstacle,Position:" + mousePos + "Scale:" + elementObject.transform.localScale.x);
+                                DataManager.WriteTestData("Set Static Obstacle,Position:" + mousePos + "Scale:" + elementObject.transform.localScale.x);
                                 editMode = EditMode.Null;
                             }
                             else if (MouseInputBase.Button1Down)
@@ -285,7 +285,7 @@ namespace Assets.Scripts.simController
                                 elementObject = ElementsManager.Instance.SelectedElement = ElementsManager.Instance.pedestrianManager.AddPedestrian();
                                 elementObject.transform.position = mousePos;
                                 Pedestrian.AddPedPos(mousePos);
-                                dataManager.WriteTestData("Set Human,Position:" + mousePos.ToString());
+                                DataManager.WriteTestData("Set Human,Position:" + mousePos.ToString());
                                 indexMode = 2;
                             }
                             else if (MouseInputBase.Button1Down)
@@ -357,7 +357,7 @@ namespace Assets.Scripts.simController
                                 NPC.UpdateElementAttributes();
                                 NPC.NPCInit();
                                 NPC.isCarDrive = true;
-                                dataManager.WriteTestData("Set AI vehicle Init Position:" + NPC.posInit + "Start Position:" + posStart);
+                                DataManager.WriteTestData("Set AI vehicle Init Position:" + NPC.posInit + "Start Position:" + posStart);
                                 editMode = EditMode.Null;
                             }
                             else if (Input.GetMouseButtonDown(1))
@@ -398,7 +398,7 @@ namespace Assets.Scripts.simController
                                 {
                                     //CPController.Instance.SwitchCheckPoint();
                                 }
-                                dataManager.WriteTestData("Set CheckPoint,Position:" + mousePos + "Scale:" + elementObject.transform.localScale.x);
+                                DataManager.WriteTestData("Set CheckPoint,Position:" + mousePos + "Scale:" + elementObject.transform.localScale.x);
                                 editMode = EditMode.Null;
                             }
                             else if (MouseInputBase.Button1Down)

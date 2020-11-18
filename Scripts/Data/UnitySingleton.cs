@@ -11,7 +11,6 @@ public class UnitySingleton<T> : MonoBehaviour where T : UnitySingleton<T>
         if (Instance == null)
         {
             Instance = (T)this;
-            DontDestroyOnLoad(gameObject);
             Debug.Log(typeof(T).ToString()+" has been Init");
         }
         else

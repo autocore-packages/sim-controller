@@ -2,7 +2,7 @@
   "name": "com.autocore.sim-controller",
   "displayName": "sim-controller",
   "description": "Controller of Simulator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "license": "MIT",
   "dependencies": 
   {

@@ -6,8 +6,24 @@ using UnityEngine.UI;
 
 namespace Assets.Scripts.simController
 {
-    public class TestManager : UnitySingleton<TestManager>
+    public class TestManager :MonoBehaviour
     {
+
+        public static TestManager Instance { get; private set; }
+        protected virtual void Awake()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+                DontDestroyOnLoad(gameObject);
+                Debug.Log(" has been Init");
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+            LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
+        }
         public SimuTestMode testMode;
         public bool isRepeat = false;
         public enum EditMode
@@ -47,23 +63,18 @@ namespace Assets.Scripts.simController
                 return null;
             }
         }
-        public TrafficLightController ObjTL
+        public TrafficLightObj ObjTL
         {
             get
             {
                 if (ElementsManager.Instance.SelectedElement != null)
                 {
-                    var objTL = ElementsManager.Instance.SelectedElement.GetComponent<TrafficLightController>();
+                    var objTL = ElementsManager.Instance.SelectedElement.GetComponent<TrafficLightObj>();
                     if (objTL != null)
                         return objTL;
                 }
                 return null;
             }
-        }
-        protected override void Awake()
-        {
-            base.Awake();
-            LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
         }
         public DataManager dataManager;
         // Start is called before the first frame update
@@ -182,7 +193,7 @@ namespace Assets.Scripts.simController
             }
             else
             {
-                MapManager.Instance.MapData = JsonConvert.DeserializeObject<MapData>(textAsset.text);
+                ElementsManager.Instance.RoadsData = JsonConvert.DeserializeObject<RoadsData>(textAsset.text);
             }
         }
         public Vector3 mousePos;
@@ -336,7 +347,7 @@ namespace Assets.Scripts.simController
                             NPC.transform.LookAt(mousePos);
                             if (Input.GetMouseButtonDown(0))
                             {
-                                LaneData laneTemp = MapManager.Instance.SearchNearestPos2Lane(out int index, mousePos);
+                                LaneData laneTemp = ElementsManager.Instance.SearchNearestPos2Lane(out int index, mousePos);
                                 Vector3 posStart = laneTemp.List_pos[index].GetVector3();
                                 ElementsManager.Instance.isShowLine = false;
                                 NPC.posStart = posStart;

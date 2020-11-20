@@ -1,4 +1,5 @@
 ﻿using Assets.Scripts.simai;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -6,7 +7,7 @@ namespace Assets.Scripts.simController
 {
     [RequireComponent(typeof(Animator))]
     [RequireComponent(typeof(NavMeshAgent))]
-    public class PedestrainController : PedestrianObj
+    public class PedestrainController : ObjPedestrian
     {
         private Animator pedAnimator;
         private NavMeshAgent agent;
@@ -38,7 +39,7 @@ namespace Assets.Scripts.simController
             isReachTarget = false;
             agent.SetDestination(AimPos);
             agent.speed = speedObjTarget;
-        }
+        } 
 
         public override void SetPedstrianStop()
         {

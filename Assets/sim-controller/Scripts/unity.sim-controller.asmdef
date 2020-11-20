@@ -1,10 +1,10 @@
 {
     "name": "unity.sim-controller",
     "references": [
-        "unity.sim-ai",
-        "unity.sim-ui",
-        "AutoCore.Sim.Autoware.IO",
-        "AutoCore.Sim.Vehicle.Control"
+        "GUID:85dec7bf6cc480c439c9b7db6e3a0186",
+        "GUID:86a79b3574294584d9c5d4cf7eca40f7",
+        "GUID:5dd42990e2097eb408d05834f89fe03e",
+        "GUID:58d809d0b18b81d419ddf7026e99c598"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

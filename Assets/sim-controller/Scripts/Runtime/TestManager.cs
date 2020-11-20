@@ -35,10 +35,7 @@ namespace Assets.Scripts.simController
                 DataManager = go.AddComponent<TestDataManager>();
                 go.transform.SetParent(transform);
             }
-            DataManager.Init();
-            DataManager.LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
         }
-        public SimuTestMode testMode;
         public bool isRepeat = false;
         public enum EditMode
         {
@@ -51,15 +48,13 @@ namespace Assets.Scripts.simController
         }
         public EditMode editMode;
         private int indexMode = 0;
-        public NPCObj NPC
+        public ObjNPC NPC
         {
             get
             {
-                if (ElementsManager.Instance.SelectedElement != null)
+                if (ElementsManager.Instance.SelectedElement != null&& ElementsManager.Instance.SelectedElement is ObjNPC obj)
                 {
-                    var objAICar = ElementsManager.Instance.SelectedElement.GetComponent<NPCObj>();
-                    if (objAICar != null)
-                        return objAICar;
+                        return obj;
                 }
                 return null;
             }
@@ -68,32 +63,28 @@ namespace Assets.Scripts.simController
         {
             get
             {
-                if (ElementsManager.Instance.SelectedElement != null)
+                if (ElementsManager.Instance.SelectedElement != null && ElementsManager.Instance.SelectedElement is PedestrainController obj)
                 {
-                    var objHuman = ElementsManager.Instance.SelectedElement.GetComponent<PedestrainController>();
-                    if (objHuman != null)
-                        return objHuman;
+                    return obj;
                 }
                 return null;
             }
         }
-        public TrafficLightObj ObjTL
+        public ObjTrafficLight TL
         {
             get
             {
-                if (ElementsManager.Instance.SelectedElement != null)
+                if (ElementsManager.Instance.SelectedElement != null && ElementsManager.Instance.SelectedElement is ObjTrafficLight obj)
                 {
-                    var objTL = ElementsManager.Instance.SelectedElement.GetComponent<TrafficLightObj>();
-                    if (objTL != null)
-                        return objTL;
+                    return obj;
                 }
                 return null;
             }
         }
-        // Start is called before the first frame update
-        void Start()
+        public void OnEnterSim()
         {
-            testMode = TestConfig.TestMode;
+            DataManager.Init();
+            DataManager.LoadRoadData("RoadData/" + TestConfig.testMap.ToString());
             PanelInspector.Instance.button_AddPos.onClick.AddListener(() =>
             {
                 SetHumanPoses();
@@ -108,7 +99,7 @@ namespace Assets.Scripts.simController
             });
             PanelInspector.Instance.button_SwitchLight.onClick.AddListener(() =>
             {
-                ObjTL.SwitchLight();
+                TL.SwitchLight();
             });
             PanelInspector.Instance.button_SetAim.onClick.AddListener(() =>
             {
@@ -120,18 +111,16 @@ namespace Assets.Scripts.simController
             });
             PanelInspector.Instance.OnSwitchLight += () =>
             {
-                var traffic = ObjTL;
+                var traffic = TL;
                 if (traffic != null)
                 {
                     traffic.SwitchLight();
                 }
             };
-            Debug.Log(OverLookCameraController.Instance);
-            Debug.Log(PanelSettings.Instance);
-            OverLookCameraController.Instance.IsFollowTargetPos=PanelSettings.Instance.toggle_FollowCarPos.isOn;
-            OverLookCameraController.Instance.IsFollowTargetRot=PanelSettings.Instance.toggle_FollowCarRot.isOn;
+            OverLookCameraController.Instance.IsFollowTargetPos = PanelSettings.Instance.toggle_FollowCarPos.isOn;
+            OverLookCameraController.Instance.IsFollowTargetRot = PanelSettings.Instance.toggle_FollowCarRot.isOn;
 
-            PanelTools.Instance.button_resetAll.onClick.AddListener(() => 
+            PanelTools.Instance.button_resetAll.onClick.AddListener(() =>
             {
                 ElementsManager.Instance.RemoveAllElements();
                 PanelTools.Instance.CloseAllMenu();
@@ -156,16 +145,16 @@ namespace Assets.Scripts.simController
                 SetAddObstacle();
                 PanelTools.Instance.CloseAllMenu();
             });
-            PanelTools.Instance.MenuButtons[2].GetComponent<Button>().onClick.AddListener(() =>
+            PanelTools.Instance.menuButtons[2].m_button.onClick.AddListener(() =>
             {
                 SetCarSetMode();
             });
-            PanelTools.Instance.MenuButtons[4].GetComponent<Button>().onClick.AddListener(() =>
+            PanelTools.Instance.menuButtons[2].m_button.onClick.AddListener(() =>
             {
                 PanelTools.Instance.OpenGitURL();
             });
 
-            PanelCamera.Instance.btn_SwitchCamera.onClick.AddListener(()=> { OverLookCameraController.Instance.SwitchCamera();});
+            PanelCamera.Instance.btn_SwitchCamera.onClick.AddListener(() => { OverLookCameraController.Instance.SwitchCamera(); });
 
         }
         public void SetEditMode(EditMode mode, int index = 0)
@@ -201,6 +190,7 @@ namespace Assets.Scripts.simController
         ElementObject elementObject;
         private void Update()
         {
+            if (OverLookCameraController.Instance == null) return;
             mousePos = OverLookCameraController.Instance.MouseWorldPos;
             Vector3 offset = OverLookCameraController.Instance.MouseWorldPos - EgoVehicle.Instance.transform.position;
             float dis2Front = Mathf.Abs(Vector3.Dot(offset, EgoVehicle.Instance.transform.forward));
@@ -284,6 +274,7 @@ namespace Assets.Scripts.simController
                                 PanelOther.Instance.SetTipText("Click to add target position for pedestrian, right click to cancel");
                                 elementObject = ElementsManager.Instance.SelectedElement = ElementsManager.Instance.pedestrianManager.AddPedestrian();
                                 elementObject.transform.position = mousePos;
+                                Debug.Log(elementObject.transform.position);
                                 Pedestrian.AddPedPos(mousePos);
                                 DataManager.WriteTestData("Set Human,Position:" + mousePos.ToString());
                                 indexMode = 2;
@@ -294,6 +285,7 @@ namespace Assets.Scripts.simController
                             }
                             break;
                         case 2:
+                            Debug.Log(elementObject.m_transform.position);
                             ElementsManager.Instance.isShowLine = true;
                             ElementsManager.Instance.LinePoses = new Vector3[Pedestrian.PosList.Count + 1];
                             Pedestrian.PosList.CopyTo(ElementsManager.Instance.LinePoses);
@@ -375,7 +367,7 @@ namespace Assets.Scripts.simController
                             if (Input.GetMouseButtonDown(0))
                             {
                                 PanelOther.Instance.SetTipText("AI vehicle settled");
-                                ElementsManager.Instance.SelectedElement.GetComponent<NPCObj>().SetTarget(mousePos);
+                                NPC.SetTarget(mousePos);
                                 editMode = EditMode.Null;
                             }
                             break;

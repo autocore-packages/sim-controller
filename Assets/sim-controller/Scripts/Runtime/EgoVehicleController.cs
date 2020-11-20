@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Assets.Scripts.simController
 {
-    public class EgoVehicleController : EgoVehicleObj
+    public class EgoVehicleController : ObjEgo
     {
     }
 }

@@ -105,14 +105,19 @@ namespace Assets.Scripts.simController
         }
         public Vector3 mousePosDragStart;
         private bool isDrageCamera = false;
-        private void Start()
+
+        protected override void Awake()
         {
+            base.Awake();
             m_transform = transform;
             m_camera = GetComponent<Camera>();
             target = EgoVehicle.Instance.transform;
+        }
+        private void Start()
+        {
+            TestManager.Instance.OnEnterSim();
             m_transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
             mask = 1 << 12;
-            ElementsManager.Instance.OnCameraRotate = OntargetRotate;
         }
 
         public void OntargetRotate(Vector3 rot)
@@ -194,6 +199,7 @@ namespace Assets.Scripts.simController
             if (isFollowTargetRot) 
             {
                 OntargetRotate(target.rotation.eulerAngles);
+                ElementsManager.Instance.OnCameraRotate(target.rotation.eulerAngles);
             }
             m_transform.position = new Vector3(PosTarget.x + Offset.x, 50, PosTarget.z + Offset.z);
         }

@@ -116,6 +116,7 @@ namespace Assets.Scripts.simController
             WriteFile(dataFilePath, DateTime.Now.ToString(timeFormat) + " " + content);
         }
 
+
         public void WriteFile(string path, string content, bool isCover = false)
         {
             if (isCover)
@@ -124,7 +125,7 @@ namespace Assets.Scripts.simController
             }
             else
             {
-                File.AppendAllText(path + "\n", content);
+                File.AppendAllText(path, content + "\n");
             }
         }
         StreamWriter sw;

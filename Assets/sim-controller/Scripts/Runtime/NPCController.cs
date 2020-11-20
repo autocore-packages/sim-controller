@@ -5,7 +5,7 @@ using Assets.Scripts.simai;
 
 namespace Assets.Scripts.simController
 {
-    public class NPCController : NPCObj
+    public class NPCController : ObjNPC
     {
         public override float SpeedCurrent
         {

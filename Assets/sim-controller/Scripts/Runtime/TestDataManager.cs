@@ -66,24 +66,27 @@ namespace Assets.Scripts.simController
                 MapName = TestConfig.testMap.ToString(),
                 LastTime = DateTime.Now
             };
-            if(EgoVehicle.Instance.transform!=null) td.TestCarStart = new TransformData(EgoVehicle.Instance.transform);
-            foreach (ElementObject item in ElementsManager.Instance.checkPointManager.CheckPointList)
+            foreach (ElementObject item in ElementsManager.Instance.EgoList)
+            {
+                td.EgoAtts.Add(item.GetObjAttbutes());
+            }
+            foreach (ElementObject item in ElementsManager.Instance.CheckPointList)
             {
                 td.CheckPointAtts.Add(item.GetObjAttbutes());
             }
-            foreach (ElementObject item in ElementsManager.Instance.obstacleManager.ObstacleList)
+            foreach (ElementObject item in ElementsManager.Instance.ObstacleList)
             {
                 td.ObstacleAtts.Add(item.GetObjAttbutes());
             }
-            foreach (ElementObject item in ElementsManager.Instance.nPCManager.NPCList)
+            foreach (ElementObject item in ElementsManager.Instance.NPCList)
             {
                 td.CarAIAtts.Add(item.GetObjAttbutes());
             }
-            foreach (ElementObject item in ElementsManager.Instance.pedestrianManager.PedestrainList)
+            foreach (ElementObject item in ElementsManager.Instance.PedestrainList)
             {
                 td.HumanAtts.Add(item.GetObjAttbutes());
             }
-            foreach (ElementObject item in ElementsManager.Instance.trafficlightManager.TrafficLightList)
+            foreach (ElementObject item in ElementsManager.Instance.TrafficLightList)
             {
                 td.TrafficLightAtts.Add(item.GetObjAttbutes());
             }

@@ -37,6 +37,7 @@ namespace Assets.Scripts.simController
             }
         }
         public bool isRepeat = false;
+        public bool isROSControl = true;
         public enum EditMode
         {
             Null = 0,
@@ -127,7 +128,7 @@ namespace Assets.Scripts.simController
             });
             PanelTools.Instance.button_resetEgo.onClick.AddListener(() =>
             {
-                EgoVehicle.Instance.ResetCar();
+                ElementsManager.Instance.CurrentEgo.ElementReset();
                 PanelTools.Instance.CloseAllMenu();
             });
             PanelTools.Instance.button_addNPC.onClick.AddListener(() =>
@@ -192,9 +193,9 @@ namespace Assets.Scripts.simController
         {
             if (OverLookCameraController.Instance == null) return;
             mousePos = OverLookCameraController.Instance.MouseWorldPos;
-            Vector3 offset = OverLookCameraController.Instance.MouseWorldPos - EgoVehicle.Instance.transform.position;
-            float dis2Front = Mathf.Abs(Vector3.Dot(offset, EgoVehicle.Instance.transform.forward));
-            float dis2Right = Mathf.Abs(Vector3.Dot(offset, EgoVehicle.Instance.transform.right));
+            Vector3 offset = OverLookCameraController.Instance.MouseWorldPos - ElementsManager.Instance.CurrentEgo.transform.position;
+            float dis2Front = Mathf.Abs(Vector3.Dot(offset, ElementsManager.Instance.CurrentEgo.transform.forward));
+            float dis2Right = Mathf.Abs(Vector3.Dot(offset, ElementsManager.Instance.CurrentEgo.transform.right));
             PanelOther.Instance.ShowMouseDis2Car(OverLookCameraController.Instance.isCarCameraMain, dis2Front, dis2Right);
             switch (editMode)
             {
@@ -212,7 +213,7 @@ namespace Assets.Scripts.simController
                             if (Input.GetMouseButtonDown(0))
                             {
                                 PanelOther.Instance.SetTipText("Click to set vehicle orientation");
-                                EgoVehicle.Instance.transform.position = mousePos + Vector3.up * 0.5f;
+                                ElementsManager.Instance.CurrentEgo.transform.position = mousePos + Vector3.up * 0.5f;
                                 DataManager.WriteTestData("Set ego vehicle position:" + mousePos);
                                 indexMode = 2;
                             }
@@ -222,8 +223,8 @@ namespace Assets.Scripts.simController
                             }
                             break;
                         case 2:
-                            if (Vector3.Distance(EgoVehicle.Instance.transform.position, mousePos) > 1)
-                                EgoVehicle.Instance.transform.LookAt(mousePos, Vector3.up);
+                            if (Vector3.Distance(ElementsManager.Instance.CurrentEgo.transform.position, mousePos) > 1)
+                                ElementsManager.Instance.CurrentEgo.transform.LookAt(mousePos, Vector3.up);
                             if (Input.GetMouseButtonDown(0))
                             {
                                 editMode = EditMode.Null;
@@ -238,7 +239,7 @@ namespace Assets.Scripts.simController
                     {
                         case 0:
                             PanelOther.Instance.SetTipText("Click to set obstacle position，left ctrl+ mouse wheel to set obstacle size，right click to cancel");
-                            elementObject = ElementsManager.Instance.obstacleManager.AddObstacle();
+                            elementObject = ElementsManager.Instance.AddObstacle();
                             elementObject.transform.position = mousePos;
                             ElementsManager.Instance.SelectedElement = elementObject;
                             indexMode = 1;
@@ -272,7 +273,7 @@ namespace Assets.Scripts.simController
                             if (MouseInputBase.Button0Down)
                             {
                                 PanelOther.Instance.SetTipText("Click to add target position for pedestrian, right click to cancel");
-                                elementObject = ElementsManager.Instance.SelectedElement = ElementsManager.Instance.pedestrianManager.AddPedestrian();
+                                elementObject = ElementsManager.Instance.SelectedElement = ElementsManager.Instance.AddPedestrian();
                                 elementObject.transform.position = mousePos;
                                 Debug.Log(elementObject.transform.position);
                                 Pedestrian.AddPedPos(mousePos);
@@ -324,7 +325,7 @@ namespace Assets.Scripts.simController
                         case 1:
                             if (Input.GetMouseButtonDown(0))
                             {
-                                ElementsManager.Instance.SelectedElement = ElementsManager.Instance.nPCManager.AddNPC();
+                                ElementsManager.Instance.SelectedElement = ElementsManager.Instance.AddNPC();
                                 NPC.transform.position = NPC.posInit = mousePos;
                                 PanelOther.Instance.SetTipText("Click to set AI vehicle starting position");
                                 indexMode = 2;
@@ -380,13 +381,13 @@ namespace Assets.Scripts.simController
                     {
                         case 0:
                             PanelOther.Instance.SetTipText("Click to set checkpoint position，left ctrl+ mouse wheel to set checkpoint size，right click to cancel");
-                            ElementsManager.Instance.SelectedElement = elementObject = ElementsManager.Instance.checkPointManager.AddCheckPoint(0);
+                            ElementsManager.Instance.SelectedElement = elementObject = ElementsManager.Instance.AddCheckPoint(0);
                             indexMode = 1;
                             break;
                         case 1:
                             if (MouseInputBase.Button0Down)
                             {
-                                if (ElementsManager.Instance.checkPointManager.CheckPointList.Count == 1)
+                                if (ElementsManager.Instance.CheckPointList.Count == 1)
                                 {
                                     //CPController.Instance.SwitchCheckPoint();
                                 }

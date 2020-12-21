@@ -36,7 +36,7 @@ namespace Assets.Scripts
             {
                 if (TestModes == null) LoadAllData();
                 if (testMode == null)
-                    return TestModes[0];
+                    return TestModes[0]; 
                 return testMode; 
             }
             set { testMode = value; }

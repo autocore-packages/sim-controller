@@ -111,7 +111,7 @@ namespace Assets.Scripts.simController
             base.Awake();
             m_transform = transform;
             m_camera = GetComponent<Camera>();
-            target = EgoVehicle.Instance.transform;
+            target = ElementsManager.Instance.CurrentEgo.transform;
         }
         private void Start()
         {
@@ -176,7 +176,7 @@ namespace Assets.Scripts.simController
             }
             else if (Input.GetKeyDown(KeyCode.Delete))
             {
-                if (ElementsManager.Instance.SelectedElement != null && ElementsManager.Instance.SelectedElement.transform != EgoVehicle.Instance.transform)
+                if (ElementsManager.Instance.SelectedElement != null && ElementsManager.Instance.SelectedElement != ElementsManager.Instance.CurrentEgo)
                 {
                     ElementsManager.Instance.RemoveSelectedElement();
                 }
@@ -189,7 +189,7 @@ namespace Assets.Scripts.simController
             {
                 if (Input.GetKeyDown(KeyCode.A))
                 {
-                    EgoVehicle.Instance.SwitchDriveMode();
+                    //.Instance.SwitchDriveMode();
                 }
             }
             if (isFollowTargetPos)
@@ -261,7 +261,7 @@ namespace Assets.Scripts.simController
             CameraRange = 20;
             transform.rotation = Quaternion.Euler(90, 0, 0);
             offset = Vector3.zero;
-            PosTarget = EgoVehicle.Instance.transform.position;
+            PosTarget = ElementsManager.Instance.CurrentEgo.transform.position;
         }
     }
 

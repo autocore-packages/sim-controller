@@ -27,11 +27,15 @@ namespace Assets.Scripts.simController
                 {
                     PanelCarMessage.Instance.UpdateCarmessage(wd.steer, wd.str_Odom, wd.brake, wd.throttle, wd.speed, LinearVelocity);
                 }
-                if (!TestManager.Instance.isROSControl)
+                if (!TestManager.Instance.isROSControl&&ElementsManager.Instance.CurrentEgo==this)
                 {
                     wd.steer = Input.GetAxis("Horizontal");
                     wd.throttle = Mathf.Abs(wd.speed) < maxSpeed / 3.6f ? Input.GetAxis("Vertical") : 0;
                     wd.brake = Input.GetKey(KeyCode.X) ? 1 : 0;
+                }
+                else
+                {
+                    SpeedCalculate();
                 }
             }
         }
@@ -58,7 +62,7 @@ namespace Assets.Scripts.simController
         public float Speed => wd.speed * 3.6f;
         public float Angle => wd.angle * Mathf.Deg2Rad;
 
-        public void ResetCar()
+        public void CarPoseReset()
         {
             wd.SetVehiclePos(objAttbutes.TransformData.V3Pos.GetVector3(), Quaternion.Euler(objAttbutes.TransformData.V3Rot.GetVector3()));
             LinearVelocity = 0;
@@ -138,6 +142,12 @@ namespace Assets.Scripts.simController
                     wd.brake = 0;
                 }
             }
+        }
+
+        public override void ElementReset()
+        {
+            base.ElementReset();
+            CarPoseReset();
         }
     }
 }

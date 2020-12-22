@@ -32,7 +32,6 @@ public class WheelDrive : MonoBehaviour
     [Tooltip("The vehicle's drive type: rear-wheels drive, front-wheels drive or all-wheels drive.")]
     public DriveType driveType;
 
-    public bool isHandDrive;
     public float speed;
 
     public WheelCollider[] m_Wheels;
@@ -115,7 +114,7 @@ public class WheelDrive : MonoBehaviour
         maxTorque = value;
     }
     public void SetVehiclePos(Vector3 pos, Quaternion qua)
-    {
+    { 
         throttle = 0;
         steer = 0;
         brake = 0;

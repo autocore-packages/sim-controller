@@ -111,10 +111,10 @@ namespace Assets.Scripts.simController
             base.Awake();
             m_transform = transform;
             m_camera = GetComponent<Camera>();
-            target = ElementsManager.Instance.CurrentEgo.transform;
         }
         private void Start()
         {
+            target = ElementsManager.Instance.CurrentEgo.transform;
             TestManager.Instance.OnEnterSim();
             m_transform.rotation = Quaternion.Euler(new Vector3(90, 0, 0));
             mask = 1 << 12;

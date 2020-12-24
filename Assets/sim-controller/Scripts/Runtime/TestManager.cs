@@ -347,7 +347,7 @@ namespace Assets.Scripts.simController
                                 NPC.posStart = posStart;
                                 NPC.speedObjTarget = 5;
                                 PanelInspector.Instance.OnChangeElement(ElementsManager.Instance.SelectedElement);
-                                NPC.UpdateElementAttributes();
+                                NPC.UpdateElement2Attributes();
                                 NPC.NPCInit();
                                 NPC.isCarDrive = true;
                                 DataManager.WriteTestData("Set AI vehicle Init Position:" + NPC.posInit + "Start Position:" + posStart);

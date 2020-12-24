@@ -35,7 +35,7 @@ namespace Assets.Scripts.simController
                 }
                 else
                 {
-                    SpeedCalculate();
+                    SetWDWithSpeed();
                 }
             }
         }
@@ -88,7 +88,7 @@ namespace Assets.Scripts.simController
         public float addStep = 0.005f;
         public float keepStep = 0.0001f;
 
-        public void SpeedCalculate()
+        public void SetWDWithSpeed()
         {
             isBackUp = aimSpeed < 0;
             float _speed = Mathf.Abs(wd.speed);

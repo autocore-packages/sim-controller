@@ -43,6 +43,10 @@ public class CameraController : UnitySingleton<CameraController>
     {
         m_camera = GetComponent<Camera>();
         m_transform = GetComponent<Transform>();
+    }
+    private void Start()
+    {
+
         AdquireTarget();
         ComputeTargetOffset();
     }
